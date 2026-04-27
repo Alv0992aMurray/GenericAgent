@@ -35,9 +35,11 @@ if not os.path.exists(cdp_cfg):
 
 # Include the current time (HH:MM) in the system prompt so the agent is aware of
 # the time of day, not just the date. Useful for scheduling-related tasks.
+# Also include timezone so the agent doesn't get confused across DST changes.
 def get_system_prompt():
     with open(os.path.join(script_dir, f'assets/sys_prompt{lang_suffix}.txt'), 'r', encoding='utf-8') as f: prompt = f.read()
-    prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}  Current time: {time.strftime('%H:%M')}\n"
+    tz_name = time.strftime('%Z')  # e.g. 'EST', 'UTC', 'PST'
+    prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}  Current time: {time.strftime('%H:%M')} {tz_name}\n"
     prompt += get_global_memory()
     return prompt
 
@@ -49,9 +51,4 @@ class GeneraticAgent:
         self.task_dir = None
         self.history = []
         self.task_queue = queue.Queue() 
-        self.is_running = False; self.stop_sig = False
-        self.llm_no = 0;  self.inc_out = False
-        self.handler = None; self.verbose = True
-        self.load_llm_sessions()
-
-    def load_llm_sessions(self):
+        self.is_runni
