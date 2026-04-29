@@ -13,6 +13,9 @@ import os
 # Directory containing tool modules
 TOOLS_DIR = Path(__file__).parent
 
+# Set to True to see which tools are loaded at startup (useful during development)
+DEBUG_TOOL_LOADING = os.environ.get("GENERIC_AGENT_DEBUG_TOOLS", "").lower() in ("1", "true", "yes")
+
 
 def discover_tools(tools_dir: Path = TOOLS_DIR) -> dict:
     """Discover and load all tool modules in the tools directory.
@@ -44,6 +47,11 @@ def discover_tools(tools_dir: Path = TOOLS_DIR) -> dict:
             "schema": module.schema,
             "run": module.run,
         }
+        if DEBUG_TOOL_LOADING:
+            print(f"[tools] Loaded tool: {tool_name} (from {path.name})")
+
+    if DEBUG_TOOL_LOADING:
+        print(f"[tools] Total tools loaded: {len(tools)}")
 
     return tools
 
