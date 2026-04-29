@@ -42,12 +42,7 @@ def get_system_prompt():
     # Use full ISO-style datetime for clarity; include day-of-week for scheduling context
     prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}  Current time: {time.strftime('%H:%M:%S')} {tz_name}\n"
     # Include local UTC offset so the agent can reason about cross-timezone scheduling
-    utc_offset = time.strftime('%z')  # e.g. '+0530', '-0500'
+    utc_offset = time.strftime('%z')  # e.g. '+0530', '-0800'
     if utc_offset:
         prompt += f"UTC offset: {utc_offset}\n"
-    prompt += get_global_memory()
     return prompt
-
-class GeneraticAgent:
-    def __init__(self):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
