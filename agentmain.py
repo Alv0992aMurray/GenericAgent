@@ -39,7 +39,8 @@ if not os.path.exists(cdp_cfg):
 def get_system_prompt():
     with open(os.path.join(script_dir, f'assets/sys_prompt{lang_suffix}.txt'), 'r', encoding='utf-8') as f: prompt = f.read()
     tz_name = time.strftime('%Z')  # e.g. 'EST', 'UTC', 'PST'
-    prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}  Current time: {time.strftime('%H:%M')} {tz_name}\n"
+    # Use full ISO-style datetime for clarity; include day-of-week for scheduling context
+    prompt += f"\nToday: {time.strftime('%Y-%m-%d %a')}  Current time: {time.strftime('%H:%M:%S')} {tz_name}\n"
     prompt += get_global_memory()
     return prompt
 
@@ -47,8 +48,4 @@ class GeneraticAgent:
     def __init__(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         os.makedirs(os.path.join(script_dir, 'temp'), exist_ok=True)
-        self.lock = threading.Lock()
-        self.task_dir = None
-        self.history = []
-        self.task_queue = queue.Queue() 
-        self.is_runni
+    
