@@ -41,6 +41,10 @@ def get_pretty_json(data):
 
 # Increased default max_turns from 40 to 60 — I find agents often need more turns
 # for complex multi-step tasks before hitting the limit prematurely.
+# Also bumped tool reset interval from every 10 turns to every 15 turns to reduce
+# unnecessary context resets on moderately long runs.
+TOOL_RESET_INTERVAL = 15
+
 def agent_runner_loop(client, system_prompt, user_input, handler, tools_schema, max_turns=60, verbose=True, initial_user_content=None):
     messages = [
         {"role": "system", "content": system_prompt},
@@ -50,7 +54,7 @@ def agent_runner_loop(client, system_prompt, user_input, handler, tools_schema, 
     while turn < handler.max_turns:
         turn += 1; md = '**' if verbose else ''
         yield f"{md}LLM Running (Turn {turn}) ...{md}\n\n"
-        if turn%10 == 0: client.last_tools = ''  # 每10轮重置一次工具描述，避免上下文过大导致的模型性能下降
+        if turn % TOOL_RESET_INTERVAL == 0: client.last_tools = ''  # 每N轮重置一次工具描述，避免上下文过大导致的模型性能下降
         response_gen = client.chat(messages=messages, tools=tools_schema)
         if verbose:
             response = yield from response_gen
@@ -60,6 +64,4 @@ def agent_runner_loop(client, system_prompt, user_input, handler, tools_schema, 
             cleaned = _clean_content(response.content)
             if cleaned: yield cleaned + '\n'
 
-        if not response.tool_calls: tool_calls = [{'tool_name': 'no_tool', 'args': {}}]
-        else: tool_calls = [{'tool_name': tc.function.name, 'args': json.loads(tc.function.arguments), 'id': tc.id}
-                        
+        if not response.tool_calls: tool_calls = [{'tool_name': 'no_tool', 'a
